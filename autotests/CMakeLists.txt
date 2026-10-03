@@ -8,7 +8,7 @@ macro(KSCREEN_ADD_TEST)
         add_executable(${_testname} ${test_SRCS})
         target_link_libraries(${_testname} Qt::Core Qt::Gui Qt::Test KF6::Screen)
         add_test(NAME kscreen-${_testname}
-                 COMMAND dbus-launch $<TARGET_FILE:${_testname}>
+                 COMMAND dbus-run-session -- $<TARGET_FILE:${_testname}>
         )
         ecm_mark_as_test(${_testname})
     endforeach(_testname)

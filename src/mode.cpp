@@ -23,6 +23,7 @@ public:
         , rate(other.rate)
         , cvt(other.cvt)
         , stereo3D(other.stereo3D)
+        , virtualStereo(other.virtualStereo)
     {
     }
 
@@ -32,6 +33,7 @@ public:
     float rate;
     std::optional<Cvt> cvt;
     Mode::Stereo3D stereo3D = Mode::Stereo3D::None;
+    bool virtualStereo = false;
 };
 
 Mode::Mode()
@@ -136,6 +138,19 @@ void Mode::setCvt(const Cvt &cvt)
     Q_EMIT modeChanged();
 }
 
+bool Mode::virtualStereo() const
+{
+    return d->virtualStereo;
+}
+
+void Mode::setVirtualStereo(bool value)
+{
+    if (d->virtualStereo != value) {
+        d->virtualStereo = value;
+        Q_EMIT modeChanged();
+    }
+}
+
 Mode::Stereo3D Mode::stereo3D() const
 {
     return d->stereo3D;
@@ -154,7 +169,7 @@ void Mode::setStereo3D(Stereo3D stereo3D)
 
 bool Mode::operator==(const Mode &other) const
 {
-    return d->size == other.d->size && d->rate == other.d->rate && d->cvt == other.d->cvt && d->stereo3D == other.d->stereo3D;
+    return d->size == other.d->size && d->rate == other.d->rate && d->cvt == other.d->cvt && d->stereo3D == other.d->stereo3D && d->virtualStereo == other.d->virtualStereo;
 }
 
 QDebug operator<<(QDebug dbg, const KScreen::ModePtr &mode)
