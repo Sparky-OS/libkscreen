@@ -83,6 +83,10 @@ QJsonObject ConfigSerializer::serializeOutput(const OutputPtr &output)
     obj[QLatin1String("sizeMM")] = serializeSize(output->sizeMm());
     obj[QLatin1String("anaglyph")] = output->anaglyph();
     obj[QLatin1String("otherStereoFormats")] = output->otherStereoFormats();
+    obj[QLatin1String("stereoPairPartner")] = output->stereoPairPartner();
+    obj[QLatin1String("stereoPairMode")] = static_cast<int>(output->stereoPairMode());
+    obj[QLatin1String("stereoPairRole")] = static_cast<int>(output->stereoPairRole());
+    obj[QLatin1String("stereoPairReflection")] = static_cast<int>(output->stereoPairReflection());
     obj[QLatin1String("replicationSource")] = output->replicationSource();
 
     QJsonArray modes;
