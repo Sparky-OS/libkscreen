@@ -23,7 +23,11 @@
 using namespace KScreen;
 
 WaylandOutputDeviceRegistry::WaylandOutputDeviceRegistry()
+#ifdef KDE_OUTPUT_DEVICE_V2_STEREO_FORMATS_SINCE_VERSION
     : QWaylandClientExtensionTemplate<WaylandOutputDeviceRegistry>(27)
+#else
+    : QWaylandClientExtensionTemplate<WaylandOutputDeviceRegistry>(26)
+#endif
 {
     initialize();
 }
@@ -628,6 +632,9 @@ void WaylandOutputDevice::kde_output_device_v2_eisa_id(const QString &eisaId)
 void WaylandOutputDevice::kde_output_device_v2_capabilities(uint32_t flags)
 {
     m_capabilities = flags;
+#ifndef KDE_OUTPUT_DEVICE_V2_STEREO_FORMATS_SINCE_VERSION
+    m_capabilities &= ~uint32_t(Output::Capability::VirtualStereo);
+#endif
 }
 
 void WaylandOutputDevice::kde_output_device_v2_overscan(uint32_t overscan)
