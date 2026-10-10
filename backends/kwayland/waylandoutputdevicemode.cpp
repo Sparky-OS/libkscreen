@@ -33,6 +33,18 @@ void WaylandOutputDeviceMode::kde_output_device_mode_v2_size(int32_t width, int3
     m_size = QSize(width, height);
 }
 
+QSize WaylandOutputDeviceMode::viewSize() const
+{
+    return m_viewSize.isValid() ? m_viewSize : m_size;
+}
+
+#ifdef KDE_OUTPUT_DEVICE_MODE_V2_VIEW_SIZE_SINCE_VERSION
+void WaylandOutputDeviceMode::kde_output_device_mode_v2_view_size(int32_t width, int32_t height)
+{
+    m_viewSize = QSize(width, height);
+}
+#endif
+
 void WaylandOutputDeviceMode::kde_output_device_mode_v2_refresh(int32_t refresh)
 {
     m_refreshRate = refresh / 1000.0;

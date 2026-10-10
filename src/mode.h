@@ -23,6 +23,7 @@ class KSCREEN_EXPORT Mode : public QObject
     Q_PROPERTY(QString id READ id WRITE setId NOTIFY modeChanged)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY modeChanged)
     Q_PROPERTY(QSize size READ size WRITE setSize NOTIFY modeChanged)
+    Q_PROPERTY(QSize viewSize READ viewSize WRITE setViewSize NOTIFY modeChanged)
     Q_PROPERTY(float refreshRate READ refreshRate WRITE setRefreshRate NOTIFY modeChanged)
     Q_PROPERTY(bool virtualStereo READ virtualStereo WRITE setVirtualStereo NOTIFY modeChanged)
     Q_PROPERTY(Stereo3D stereo3D READ stereo3D WRITE setStereo3D NOTIFY modeChanged)
@@ -65,6 +66,10 @@ public:
 
     QSize size() const;
     void setSize(const QSize &size);
+
+    /** Native viewport before rotation and scale. Defaults to the mode size. */
+    QSize viewSize() const;
+    void setViewSize(const QSize &size);
 
     float refreshRate() const;
     void setRefreshRate(float refresh);

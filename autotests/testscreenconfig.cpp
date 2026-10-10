@@ -26,6 +26,7 @@ private:
 
 private Q_SLOTS:
     void initTestCase();
+    void nativeViewportGeometry();
     void singleOutput();
     void singleOutputWithoutPreferred();
     void multiOutput();
@@ -61,6 +62,37 @@ void testScreenConfig::initTestCase()
 void testScreenConfig::cleanupTestCase()
 {
     BackendManager::instance()->shutdownBackend();
+}
+
+void testScreenConfig::nativeViewportGeometry()
+{
+    Config config;
+    config.setSupportedFeatures(Config::Feature::PerOutputScaling);
+    ModePtr packed(new Mode);
+    packed->setId(QStringLiteral("headset"));
+    packed->setSize(QSize(2400, 1080));
+    packed->setViewSize(QSize(1200, 1080));
+    packed->setStereo3D(Mode::Stereo3D::SideBySideHalf);
+    ModePtr mono(new Mode);
+    mono->setId(QStringLiteral("mono"));
+    mono->setSize(QSize(2400, 1080));
+    OutputPtr output(new Output);
+    output->setModes({{packed->id(), packed}, {mono->id(), mono}});
+    output->setCurrentModeId(packed->id());
+    output->setScale(1.25);
+    output->setPos(QPoint(100, 20));
+    config.addOutput(output);
+    QCOMPARE(output->geometry(), QRect(100, 20, 960, 864));
+    QCOMPARE(output->currentMode()->size(), QSize(2400, 1080));
+    const auto copy = packed->clone();
+    QCOMPARE(copy->viewSize(), QSize(1200, 1080));
+    QVERIFY(*copy == *packed);
+    copy->setViewSize(QSize(2400, 1080));
+    QVERIFY(!(*copy == *packed));
+    output->setRotation(Output::Left);
+    QCOMPARE(config.logicalSizeForOutput(*output), QSizeF(864, 960));
+    output->setCurrentModeId(mono->id());
+    QCOMPARE(config.logicalSizeForOutput(*output), QSizeF(864, 1920));
 }
 
 void testScreenConfig::singleOutput()

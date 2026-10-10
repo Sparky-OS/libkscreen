@@ -165,6 +165,18 @@ private Q_SLOTS:
         QVERIFY(output->otherStereoFormats());
     }
 
+    void testSerializeViewport()
+    {
+        KScreen::ModePtr mode(new KScreen::Mode);
+        mode->setSize(QSize(2400, 1080));
+        mode->setViewSize(QSize(1200, 1080));
+        const auto json = KScreen::ConfigSerializer::serializeMode(mode);
+        QCOMPARE(json[QStringLiteral("size")].toObject()[QStringLiteral("width")].toInt(), 2400);
+        const auto viewport = json[QStringLiteral("viewSize")].toObject();
+        QCOMPARE(viewport[QStringLiteral("width")].toInt(), 1200);
+        QCOMPARE(viewport[QStringLiteral("height")].toInt(), 1080);
+    }
+
     void testSerializeMode()
     {
         KScreen::ModePtr mode(new KScreen::Mode);
