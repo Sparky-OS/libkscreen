@@ -25,6 +25,7 @@ public:
     QString id() const;
     float refreshRate() const;
     QSize size() const;
+    QSize viewSize() const;
     bool preferred() const;
     ModeInfo::Flags flags() const;
 
@@ -39,11 +40,15 @@ protected:
     void kde_output_device_mode_v2_preferred() override;
     void kde_output_device_mode_v2_removed() override;
     void kde_output_device_mode_v2_flags(uint32_t flags) override;
+#ifdef KDE_OUTPUT_DEVICE_MODE_V2_VIEW_SIZE_SINCE_VERSION
+    void kde_output_device_mode_v2_view_size(int32_t width, int32_t height) override;
+#endif
 
 private:
     QString m_id;
     float m_refreshRate = 60.0;
     QSize m_size;
+    QSize m_viewSize;
     bool m_preferred = false;
     ModeInfo::Flags m_flags;
 };

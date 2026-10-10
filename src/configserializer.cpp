@@ -147,6 +147,7 @@ QJsonObject ConfigSerializer::serializeMode(const ModePtr &mode)
     obj[QLatin1String("id")] = mode->id();
     obj[QLatin1String("name")] = mode->name();
     obj[QLatin1String("size")] = serializeSize(mode->size());
+    obj[QLatin1String("viewSize")] = serializeSize(mode->viewSize());
     obj[QLatin1String("refreshRate")] = mode->refreshRate();
     obj[QLatin1String("virtualStereo")] = mode->virtualStereo();
     obj[QLatin1String("stereo3D")] = static_cast<int>(mode->stereo3D());
@@ -382,6 +383,8 @@ ModePtr ConfigSerializer::deserializeMode(const QDBusArgument &arg)
             mode->setName(value.toString());
         } else if (key == QLatin1String("size")) {
             mode->setSize(deserializeSize(value.value<QDBusArgument>()));
+        } else if (key == QLatin1String("viewSize")) {
+            mode->setViewSize(deserializeSize(value.value<QDBusArgument>()));
         } else if (key == QLatin1String("refreshRate")) {
             mode->setRefreshRate(value.toFloat());
         } else if (key == QLatin1String("virtualStereo")) {

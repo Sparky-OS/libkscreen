@@ -450,7 +450,8 @@ QRect Config::outputGeometryForOutput(const KScreen::Output &output) const
 
 QSizeF Config::logicalSizeForOutput(const KScreen::Output &output) const
 {
-    QSizeF size = output.enforcedModeSize();
+    const auto mode = output.currentMode();
+    QSizeF size = mode ? mode->viewSize() : output.enforcedModeSize();
     if (!size.isValid()) {
         return QSizeF();
     }

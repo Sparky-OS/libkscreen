@@ -20,6 +20,7 @@ public:
         : id(other.id)
         , name(other.name)
         , size(other.size)
+        , viewSize(other.viewSize)
         , rate(other.rate)
         , stereo3D(other.stereo3D)
         , virtualStereo(other.virtualStereo)
@@ -29,6 +30,7 @@ public:
     QString id;
     QString name;
     QSize size;
+    QSize viewSize;
     float rate;
     Mode::Stereo3D stereo3D = Mode::Stereo3D::None;
     bool virtualStereo = false;
@@ -104,6 +106,20 @@ void Mode::setSize(const QSize &size)
     Q_EMIT modeChanged();
 }
 
+QSize Mode::viewSize() const
+{
+    return d->viewSize.isValid() ? d->viewSize : d->size;
+}
+
+void Mode::setViewSize(const QSize &size)
+{
+    if (d->viewSize == size) {
+        return;
+    }
+    d->viewSize = size;
+    Q_EMIT modeChanged();
+}
+
 float Mode::refreshRate() const
 {
     return d->rate;
@@ -151,7 +167,7 @@ void Mode::setStereo3D(Stereo3D stereo3D)
 
 bool Mode::operator==(const Mode &other) const
 {
-    return d->size == other.d->size && d->rate == other.d->rate && d->stereo3D == other.d->stereo3D && d->virtualStereo == other.d->virtualStereo;
+    return d->size == other.d->size && viewSize() == other.viewSize() && d->rate == other.d->rate && d->stereo3D == other.d->stereo3D && d->virtualStereo == other.d->virtualStereo;
 }
 
 QDebug operator<<(QDebug dbg, const KScreen::ModePtr &mode)

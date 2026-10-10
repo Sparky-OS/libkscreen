@@ -23,7 +23,9 @@
 using namespace KScreen;
 
 WaylandOutputDeviceRegistry::WaylandOutputDeviceRegistry()
-#ifdef KDE_OUTPUT_DEVICE_V2_STEREO_FORMATS_SINCE_VERSION
+#if defined(KDE_OUTPUT_DEVICE_MODE_V2_VIEW_SIZE_SINCE_VERSION)
+    : QWaylandClientExtensionTemplate<WaylandOutputDeviceRegistry>(25)
+#elif defined(KDE_OUTPUT_DEVICE_V2_STEREO_FORMATS_SINCE_VERSION)
     : QWaylandClientExtensionTemplate<WaylandOutputDeviceRegistry>(24)
 #else
     : QWaylandClientExtensionTemplate<WaylandOutputDeviceRegistry>(23)
@@ -193,6 +195,7 @@ void KScreen::WaylandOutputDevice::updateKScreenModes(OutputPtr &output)
         mode->setId(wlMode->id());
         mode->setRefreshRate(wlMode->refreshRate());
         mode->setSize(wlMode->size());
+        mode->setViewSize(wlMode->viewSize());
         mode->setName(modeName(wlMode));
         if (wlMode->flags() & ModeInfo::Flag::Stereo3DSideBySideHalf) {
             mode->setStereo3D(Mode::Stereo3D::SideBySideHalf);
