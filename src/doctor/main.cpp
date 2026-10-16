@@ -76,7 +76,13 @@ int main(int argc, char **argv)
         "   Add a custom mode: (arguments: width,height,refresh rate in mHz,blanking 'reduced' or 'full')\n"
         "   $ kscreen-doctor output.1.addCustomMode.1920.1080.75000.full\n"
         "   Remove a custom mode: (arguments: index in the custom mode list)\n"
-        "   $ kscreen-doctor output.1.removeCustomMode.0");
+        "   $ kscreen-doctor output.1.removeCustomMode.0\n"
+        "\n   Time side by side (full) 3D modes (possible values: wholeLineDoubled, blankingKept)\n"
+        "   $ kscreen-doctor output.HDMI-A-1.sideBySideFullTiming.blankingKept\n"
+        "\n   Choose the depth sent with picture and depth 3D modes (possible values: flat, desktop, desktopAndContent)\n"
+        "   $ kscreen-doctor output.HDMI-A-1.stereoDepth.desktop\n"
+        "\n   Set the viewing distance of picture and depth 3D modes in centimetres (0 for automatic)\n"
+        "   $ kscreen-doctor output.HDMI-A-1.viewingDistance.250");
     /*
         "\nError codes:\n"
         "   2 : general parse error\n"

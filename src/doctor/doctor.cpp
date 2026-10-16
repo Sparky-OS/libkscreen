@@ -23,6 +23,7 @@
 #include <QScreen>
 #include <QStandardPaths>
 
+#include <algorithm>
 #include <print>
 #include <ranges>
 #include <utility>
@@ -643,6 +644,41 @@ void Doctor::parseOutputArgs()
                         output->setOtherStereoFormats(ops[3] == "enable");
                     }
                     m_changed = true;
+                } else if (ops.count() == 4 && subcmd == "sideBySideFullTiming") {
+                    if (ops[3] == "wholeLineDoubled") {
+                        output->setSideBySideFullTiming(Output::SideBySideFullTiming::WholeLineDoubled);
+                    } else if (ops[3] == "blankingKept") {
+                        output->setSideBySideFullTiming(Output::SideBySideFullTiming::BlankingKept);
+                    } else {
+                        qCWarning(KSCREEN_DOCTOR) << "Invalid input: Only 'wholeLineDoubled' and 'blankingKept' are allowed";
+                        qApp->exit(9);
+                        return;
+                    }
+                    m_changed = true;
+                } else if (ops.count() == 4 && subcmd == "stereoDepth") {
+                    if (ops[3] == "flat") {
+                        output->setStereoDepthSource(Output::StereoDepthSource::Flat);
+                    } else if (ops[3] == "desktop") {
+                        output->setStereoDepthSource(Output::StereoDepthSource::Desktop);
+                    } else if (ops[3] == "desktopAndContent") {
+                        output->setStereoDepthSource(Output::StereoDepthSource::DesktopAndContent);
+                    } else {
+                        qCWarning(KSCREEN_DOCTOR) << "Invalid input: Only 'flat', 'desktop' and 'desktopAndContent' are allowed";
+                        qApp->exit(9);
+                        return;
+                    }
+                    m_changed = true;
+                } else if (ops.count() == 4 && subcmd == "viewingDistance") {
+                    bool ok = false;
+                    const uint distance = ops[3].toUInt(&ok);
+                    // centimetres in the 16 bits of dref (HDMI 1.4a, Table H-4); 0 is automatic
+                    if (!ok || distance > 65535) {
+                        qCWarning(KSCREEN_DOCTOR) << "Invalid input: the viewing distance is in centimetres, 0 to 65535, 0 for automatic";
+                        qApp->exit(9);
+                        return;
+                    }
+                    output->setStereoViewingDistance(distance);
+                    m_changed = true;
                 } else if (ops.count() >= 4 && subcmd == "abm") {
                     bool ok = false;
                     const uint32_t level = ops[3].toUInt(&ok);
@@ -746,6 +782,14 @@ void Doctor::showOutputs() const
                 name = name + QStringLiteral("(3D-FP)");
             } else if (mode->stereo3D() == Mode::Stereo3D::SideBySideFull) {
                 name = name + QStringLiteral("(3D-SBS-full)");
+            } else if (mode->stereo3D() == Mode::Stereo3D::FieldAlternative) {
+                name = name + QStringLiteral("(3D-field-alt)");
+            } else if (mode->stereo3D() == Mode::Stereo3D::LineAlternative) {
+                name = name + QStringLiteral("(3D-line-alt)");
+            } else if (mode->stereo3D() == Mode::Stereo3D::LDepth) {
+                name = name + QStringLiteral("(3D-L+depth)");
+            } else if (mode->stereo3D() == Mode::Stereo3D::LDepthGraphics) {
+                name = name + QStringLiteral("(3D-L+depth+gfx)");
             }
             if (mode->virtualStereo()) {
                 name += QStringLiteral("(virtual-3D:%1)").arg(int(mode->stereo3D()));
@@ -994,6 +1038,15 @@ void Doctor::showOutputs() const
             cout << cr << "supported, set to " << output->abmLevel() << endl;
         } else {
             cout << cr << "unsupported" << endl;
+        }
+        if (output->capabilities() & Output::Capability::SideBySideFullTiming) {
+            cout << yellow << "\tSide by side (full) timing: " << cr
+                 << (output->sideBySideFullTiming() == Output::SideBySideFullTiming::BlankingKept ? "blanking kept" : "whole line doubled") << endl;
+        }
+        if (output->capabilities() & Output::Capability::StereoDepth) {
+            static const char *sources[] = {"flat", "desktop", "desktop and content"};
+            cout << yellow << "\tStereo depth: " << cr << sources[std::clamp(int(output->stereoDepthSource()), 0, 2)] << ", viewing distance "
+                 << output->stereoViewingDistance() << endl;
         }
     }
 }

@@ -49,7 +49,10 @@ public:
         CheckerboardRightFirst,
         SequentialLeftFirst,
         SequentialRightFirst,
-
+        FieldAlternative,
+        LineAlternative,
+        LDepth,
+        LDepthGraphics,
     };
     Q_ENUM(Stereo3D)
 

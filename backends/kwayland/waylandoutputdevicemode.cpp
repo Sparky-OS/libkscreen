@@ -96,6 +96,21 @@ void WaylandOutputDeviceMode::kde_output_device_mode_v2_flags(uint32_t flags)
     if (flags & 0x80000) {
         m_flags |= ModeInfo::Flag::Stereo3DSequentialRightFirst;
     }
+#ifdef KDE_OUTPUT_DEVICE_MODE_V2_FLAGS_STEREO_L_DEPTH_GRAPHICS_SINCE_VERSION
+    // the other HDMI 1.4a 3D structures, since version 28
+    if (flags & KDE_OUTPUT_DEVICE_MODE_V2_FLAGS_STEREO_FIELD_ALTERNATIVE) {
+        m_flags |= ModeInfo::Flag::Stereo3DFieldAlternative;
+    }
+    if (flags & KDE_OUTPUT_DEVICE_MODE_V2_FLAGS_STEREO_LINE_ALTERNATIVE) {
+        m_flags |= ModeInfo::Flag::Stereo3DLineAlternative;
+    }
+    if (flags & KDE_OUTPUT_DEVICE_MODE_V2_FLAGS_STEREO_L_DEPTH) {
+        m_flags |= ModeInfo::Flag::Stereo3DLDepth;
+    }
+    if (flags & KDE_OUTPUT_DEVICE_MODE_V2_FLAGS_STEREO_L_DEPTH_GRAPHICS) {
+        m_flags |= ModeInfo::Flag::Stereo3DLDepthGraphics;
+    }
+#endif
 
     if (flags & KDE_OUTPUT_DEVICE_MODE_V2_FLAGS_CUSTOM) {
         m_flags |= ModeInfo::Flag::Custom;

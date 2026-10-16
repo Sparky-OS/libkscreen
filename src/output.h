@@ -46,6 +46,11 @@ public:
         VirtualStereo = 0x4000,
         Stereo3DSequentialLeftFirst = 0x40000,
         Stereo3DSequentialRightFirst = 0x80000,
+        // the other HDMI 1.4a 3D structures (kde_output_device_mode_v2.flags since version 28)
+        Stereo3DFieldAlternative = 0x100000,
+        Stereo3DLineAlternative = 0x200000,
+        Stereo3DLDepth = 0x400000,
+        Stereo3DLDepthGraphics = 0x800000,
     };
     Q_ENUM(Flag);
     Q_DECLARE_FLAGS(Flags, Flag)
@@ -62,6 +67,9 @@ class KSCREEN_EXPORT Output : public QObject
     Q_OBJECT
     Q_PROPERTY(bool anaglyph READ anaglyph WRITE setAnaglyph NOTIFY anaglyphChanged)
     Q_PROPERTY(bool otherStereoFormats READ otherStereoFormats WRITE setOtherStereoFormats NOTIFY otherStereoFormatsChanged)
+    Q_PROPERTY(SideBySideFullTiming sideBySideFullTiming READ sideBySideFullTiming WRITE setSideBySideFullTiming NOTIFY sideBySideFullTimingChanged)
+    Q_PROPERTY(StereoDepthSource stereoDepthSource READ stereoDepthSource WRITE setStereoDepthSource NOTIFY stereoDepthChanged)
+    Q_PROPERTY(uint stereoViewingDistance READ stereoViewingDistance WRITE setStereoViewingDistance NOTIFY stereoDepthChanged)
     Q_PROPERTY(QString stereoPairPartner READ stereoPairPartner WRITE setStereoPairPartner NOTIFY stereoPairChanged)
     Q_PROPERTY(StereoPairMode stereoPairMode READ stereoPairMode WRITE setStereoPairMode NOTIFY stereoPairChanged)
     Q_PROPERTY(StereoPairRole stereoPairRole READ stereoPairRole WRITE setStereoPairRole NOTIFY stereoPairChanged)
@@ -155,6 +163,9 @@ public:
         HdrIccProfile = 1 << 15,
         AbmLevel = 1 << 16,
         VirtualStereo = 1 << 17,
+        // 1 << 18 and 1 << 19 are the compositor's swap eyes and iZ3D options
+        SideBySideFullTiming = 1 << 20,
+        StereoDepth = 1 << 21,
     };
     Q_ENUM(Capability)
     Q_DECLARE_FLAGS(Capabilities, Capability)
@@ -166,6 +177,27 @@ public:
     Q_ENUM(StereoPairRole)
     enum class StereoPairReflection { None, Horizontal, Vertical };
     Q_ENUM(StereoPairReflection)
+    /**
+     * How a side by side (full) 3D mode is timed: the whole line doubled, as HDMI 1.4a,
+     * Appendix H, Figure H-4 does (the default), or the horizontal blanking kept, as NVIDIA's
+     * driver does. The picture is the same; the signal differs.
+     */
+    enum class SideBySideFullTiming {
+        WholeLineDoubled,
+        BlankingKept
+    };
+    Q_ENUM(SideBySideFullTiming)
+    /**
+     * What the depth picture of a picture and depth 3D mode shows: everything at the screen's
+     * depth, the desktop's depth levels, or those and the depth of 3D content estimated from its
+     * two views (the default).
+     */
+    enum class StereoDepthSource {
+        Flat,
+        Desktop,
+        DesktopAndContent
+    };
+    Q_ENUM(StereoDepthSource)
 
     enum class VrrPolicy {
         Never = 0,
@@ -662,6 +694,16 @@ public:
     void setStereoPairReflection(StereoPairReflection reflection);
     uint32_t abmLevel() const;
     void setAbmLevel(uint32_t level);
+    SideBySideFullTiming sideBySideFullTiming() const;
+    void setSideBySideFullTiming(SideBySideFullTiming timing);
+    StereoDepthSource stereoDepthSource() const;
+    void setStereoDepthSource(StereoDepthSource source);
+    /**
+     * The viewer's distance from the screen in centimetres, for the 3D metadata of a picture
+     * and depth mode; 0 lets the compositor derive it from the display's size.
+     */
+    uint stereoViewingDistance() const;
+    void setStereoViewingDistance(uint distance);
 
     void apply(const OutputPtr &other);
 
@@ -714,6 +756,8 @@ Q_SIGNALS:
     void otherStereoFormatsChanged();
     void stereoPairChanged();
     void abmLevelChanged();
+    void sideBySideFullTimingChanged();
+    void stereoDepthChanged();
 
     /** The mode list changed.
      *

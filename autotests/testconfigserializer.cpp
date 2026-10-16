@@ -6,6 +6,7 @@
  */
 
 #include <QObject>
+#include <QSignalSpy>
 #include <QTest>
 #include <cstdint>
 #include <utility>
@@ -163,6 +164,50 @@ private Q_SLOTS:
         output->apply(cloned);
         QVERIFY(output->anaglyph());
         QVERIFY(output->otherStereoFormats());
+    }
+
+    void testSerializeDepthStructures()
+    {
+        // every HDMI 1.4a 3D structure survives a round trip of the mode
+        for (const auto structure : {KScreen::Mode::Stereo3D::FieldAlternative,
+                                     KScreen::Mode::Stereo3D::LineAlternative,
+                                     KScreen::Mode::Stereo3D::LDepth,
+                                     KScreen::Mode::Stereo3D::LDepthGraphics}) {
+            KScreen::ModePtr mode(new KScreen::Mode);
+            mode->setId(QStringLiteral("3"));
+            mode->setSize(QSize(1920, 1080));
+            mode->setRefreshRate(60);
+            mode->setStereo3D(structure);
+            const auto json = KScreen::ConfigSerializer::serializeMode(mode);
+            QCOMPARE(json[QStringLiteral("stereo3D")].toInt(), int(structure));
+            QCOMPARE(mode->clone()->stereo3D(), structure);
+        }
+
+        // the side by side (full) timing and the depth settings: spec timing and estimated depth by default
+        KScreen::OutputPtr output(new KScreen::Output);
+        QCOMPARE(output->sideBySideFullTiming(), KScreen::Output::SideBySideFullTiming::WholeLineDoubled);
+        QCOMPARE(output->stereoDepthSource(), KScreen::Output::StereoDepthSource::DesktopAndContent);
+        QCOMPARE(output->stereoViewingDistance(), 0u);
+        output->setSideBySideFullTiming(KScreen::Output::SideBySideFullTiming::BlankingKept);
+        output->setStereoDepthSource(KScreen::Output::StereoDepthSource::Desktop);
+        output->setStereoViewingDistance(250);
+        const auto cloned = output->clone();
+        QCOMPARE(cloned->sideBySideFullTiming(), KScreen::Output::SideBySideFullTiming::BlankingKept);
+        QCOMPARE(cloned->stereoDepthSource(), KScreen::Output::StereoDepthSource::Desktop);
+        QCOMPARE(cloned->stereoViewingDistance(), 250u);
+        const auto json = KScreen::ConfigSerializer::serializeOutput(output);
+        QCOMPARE(json[QStringLiteral("sideBySideFullTiming")].toInt(), 1);
+        QCOMPARE(json[QStringLiteral("stereoDepthSource")].toInt(), 1);
+        QCOMPARE(json[QStringLiteral("stereoViewingDistance")].toInt(), 250);
+        KScreen::OutputPtr other(new KScreen::Output);
+        QSignalSpy timing(other.data(), &KScreen::Output::sideBySideFullTimingChanged);
+        QSignalSpy depth(other.data(), &KScreen::Output::stereoDepthChanged);
+        other->apply(cloned);
+        QCOMPARE(other->sideBySideFullTiming(), KScreen::Output::SideBySideFullTiming::BlankingKept);
+        QCOMPARE(other->stereoDepthSource(), KScreen::Output::StereoDepthSource::Desktop);
+        QCOMPARE(other->stereoViewingDistance(), 250u);
+        QCOMPARE(timing.count(), 1);
+        QVERIFY(depth.count() >= 1);
     }
 
     void testSerializeViewport()

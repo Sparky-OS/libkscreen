@@ -98,6 +98,9 @@ public:
         , stereoPairRole(other.stereoPairRole)
         , stereoPairReflection(other.stereoPairReflection)
         , abmLevel(other.abmLevel)
+        , sideBySideFullTiming(other.sideBySideFullTiming)
+        , stereoDepthSource(other.stereoDepthSource)
+        , stereoViewingDistance(other.stereoViewingDistance)
     {
         const auto otherModeList = other.modeList;
         for (const ModePtr &otherMode : otherModeList) {
@@ -175,6 +178,9 @@ public:
     Output::StereoPairRole stereoPairRole = Output::StereoPairRole::Left;
     Output::StereoPairReflection stereoPairReflection = Output::StereoPairReflection::None;
     uint32_t abmLevel = 0;
+    Output::SideBySideFullTiming sideBySideFullTiming = Output::SideBySideFullTiming::WholeLineDoubled;
+    Output::StereoDepthSource stereoDepthSource = Output::StereoDepthSource::DesktopAndContent;
+    uint stereoViewingDistance = 0;
 };
 
 bool Output::Private::compareModeList(const ModeList &before, const ModeList &after)
@@ -1212,6 +1218,45 @@ void Output::setAbmLevel(uint32_t level)
     }
 }
 
+Output::SideBySideFullTiming Output::sideBySideFullTiming() const
+{
+    return d->sideBySideFullTiming;
+}
+
+void Output::setSideBySideFullTiming(SideBySideFullTiming timing)
+{
+    if (d->sideBySideFullTiming != timing) {
+        d->sideBySideFullTiming = timing;
+        Q_EMIT sideBySideFullTimingChanged();
+    }
+}
+
+Output::StereoDepthSource Output::stereoDepthSource() const
+{
+    return d->stereoDepthSource;
+}
+
+void Output::setStereoDepthSource(StereoDepthSource source)
+{
+    if (d->stereoDepthSource != source) {
+        d->stereoDepthSource = source;
+        Q_EMIT stereoDepthChanged();
+    }
+}
+
+uint Output::stereoViewingDistance() const
+{
+    return d->stereoViewingDistance;
+}
+
+void Output::setStereoViewingDistance(uint distance)
+{
+    if (d->stereoViewingDistance != distance) {
+        d->stereoViewingDistance = distance;
+        Q_EMIT stereoDepthChanged();
+    }
+}
+
 void Output::apply(const OutputPtr &other)
 {
     typedef void (KScreen::Output::*ChangeSignal)();
@@ -1422,6 +1467,15 @@ void Output::apply(const OutputPtr &other)
     if (d->abmLevel != other->d->abmLevel) {
         changes << &Output::abmLevelChanged;
         setAbmLevel(other->d->abmLevel);
+    }
+    if (d->sideBySideFullTiming != other->d->sideBySideFullTiming) {
+        changes << &Output::sideBySideFullTimingChanged;
+        setSideBySideFullTiming(other->d->sideBySideFullTiming);
+    }
+    if (d->stereoDepthSource != other->d->stereoDepthSource || d->stereoViewingDistance != other->d->stereoViewingDistance) {
+        changes << &Output::stereoDepthChanged;
+        setStereoDepthSource(other->d->stereoDepthSource);
+        setStereoViewingDistance(other->d->stereoViewingDistance);
     }
 
     // Non-notifyable changes

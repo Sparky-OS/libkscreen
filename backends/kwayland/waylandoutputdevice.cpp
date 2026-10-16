@@ -23,7 +23,9 @@
 using namespace KScreen;
 
 WaylandOutputDeviceRegistry::WaylandOutputDeviceRegistry()
-#if defined(KDE_OUTPUT_DEVICE_MODE_V2_VIEW_SIZE_SINCE_VERSION)
+#if defined(KDE_OUTPUT_DEVICE_V2_STEREO_DEPTH_SINCE_VERSION)
+    : QWaylandClientExtensionTemplate<WaylandOutputDeviceRegistry>(28)
+#elif defined(KDE_OUTPUT_DEVICE_MODE_V2_VIEW_SIZE_SINCE_VERSION)
     : QWaylandClientExtensionTemplate<WaylandOutputDeviceRegistry>(25)
 #elif defined(KDE_OUTPUT_DEVICE_V2_STEREO_FORMATS_SINCE_VERSION)
     : QWaylandClientExtensionTemplate<WaylandOutputDeviceRegistry>(24)
@@ -205,6 +207,14 @@ void KScreen::WaylandOutputDevice::updateKScreenModes(OutputPtr &output)
             mode->setStereo3D(Mode::Stereo3D::FramePacking);
         } else if (wlMode->flags() & ModeInfo::Flag::Stereo3DSideBySideFull) {
             mode->setStereo3D(Mode::Stereo3D::SideBySideFull);
+        } else if (wlMode->flags() & ModeInfo::Flag::Stereo3DFieldAlternative) {
+            mode->setStereo3D(Mode::Stereo3D::FieldAlternative);
+        } else if (wlMode->flags() & ModeInfo::Flag::Stereo3DLineAlternative) {
+            mode->setStereo3D(Mode::Stereo3D::LineAlternative);
+        } else if (wlMode->flags() & ModeInfo::Flag::Stereo3DLDepth) {
+            mode->setStereo3D(Mode::Stereo3D::LDepth);
+        } else if (wlMode->flags() & ModeInfo::Flag::Stereo3DLDepthGraphics) {
+            mode->setStereo3D(Mode::Stereo3D::LDepthGraphics);
         }
 
         if (wlMode->flags() & ModeInfo::Flag::Stereo3DAnaglyphModern) {
@@ -322,6 +332,9 @@ void WaylandOutputDevice::updateKScreenOutput(OutputPtr &output, const QMap<int,
     output->setStereoPairRole(static_cast<Output::StereoPairRole>(m_stereoPairRole));
     output->setStereoPairReflection(static_cast<Output::StereoPairReflection>(m_stereoPairReflection));
     output->setAbmLevel(m_abmLevel);
+    output->setSideBySideFullTiming(static_cast<Output::SideBySideFullTiming>(m_sideBySideFullTiming));
+    output->setStereoDepthSource(static_cast<Output::StereoDepthSource>(m_stereoDepthSource));
+    output->setStereoViewingDistance(m_stereoViewingDistance);
 
     updateKScreenModes(output);
 
@@ -548,6 +561,18 @@ bool WaylandOutputDevice::setWlConfig(WaylandOutputManagement *management,
         wlConfig->set_abm_level(object(), output->abmLevel());
         changed = true;
     }
+#ifdef KDE_OUTPUT_CONFIGURATION_V2_SET_STEREO_DEPTH_SINCE_VERSION
+    if (version >= KDE_OUTPUT_CONFIGURATION_V2_SET_SIDE_BY_SIDE_FULL_TIMING_SINCE_VERSION
+        && m_sideBySideFullTiming != static_cast<uint32_t>(output->sideBySideFullTiming())) {
+        wlConfig->set_side_by_side_full_timing(object(), static_cast<uint32_t>(output->sideBySideFullTiming()));
+        changed = true;
+    }
+    if (version >= KDE_OUTPUT_CONFIGURATION_V2_SET_STEREO_DEPTH_SINCE_VERSION
+        && (m_stereoDepthSource != static_cast<uint32_t>(output->stereoDepthSource()) || m_stereoViewingDistance != output->stereoViewingDistance())) {
+        wlConfig->set_stereo_depth(object(), static_cast<uint32_t>(output->stereoDepthSource()), output->stereoViewingDistance());
+        changed = true;
+    }
+#endif
 
     return changed;
 }
@@ -614,6 +639,9 @@ void WaylandOutputDevice::kde_output_device_v2_capabilities(uint32_t flags)
     m_capabilities = flags;
 #ifndef KDE_OUTPUT_DEVICE_V2_STEREO_FORMATS_SINCE_VERSION
     m_capabilities &= ~uint32_t(Output::Capability::VirtualStereo);
+#endif
+#ifndef KDE_OUTPUT_DEVICE_V2_STEREO_DEPTH_SINCE_VERSION
+    m_capabilities &= ~(uint32_t(Output::Capability::SideBySideFullTiming) | uint32_t(Output::Capability::StereoDepth));
 #endif
 }
 
@@ -796,6 +824,19 @@ void WaylandOutputDevice::kde_output_device_v2_abm_level(uint32_t level)
 {
     m_abmLevel = level;
 }
+
+#ifdef KDE_OUTPUT_DEVICE_V2_STEREO_DEPTH_SINCE_VERSION
+void WaylandOutputDevice::kde_output_device_v2_side_by_side_full_timing(uint32_t timing)
+{
+    m_sideBySideFullTiming = timing;
+}
+
+void WaylandOutputDevice::kde_output_device_v2_stereo_depth(uint32_t source, uint32_t viewingDistance)
+{
+    m_stereoDepthSource = source;
+    m_stereoViewingDistance = viewingDistance;
+}
+#endif
 
 QByteArray WaylandOutputDevice::edid() const
 {

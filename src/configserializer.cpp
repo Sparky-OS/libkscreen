@@ -88,6 +88,9 @@ QJsonObject ConfigSerializer::serializeOutput(const OutputPtr &output)
     obj[QLatin1String("sizeMM")] = serializeSize(output->sizeMm());
     obj[QLatin1String("anaglyph")] = output->anaglyph();
     obj[QLatin1String("otherStereoFormats")] = output->otherStereoFormats();
+    obj[QLatin1String("sideBySideFullTiming")] = static_cast<int>(output->sideBySideFullTiming());
+    obj[QLatin1String("stereoDepthSource")] = static_cast<int>(output->stereoDepthSource());
+    obj[QLatin1String("stereoViewingDistance")] = static_cast<int>(output->stereoViewingDistance());
     obj[QLatin1String("stereoPairPartner")] = output->stereoPairPartner();
     obj[QLatin1String("stereoPairMode")] = static_cast<int>(output->stereoPairMode());
     obj[QLatin1String("stereoPairRole")] = static_cast<int>(output->stereoPairRole());
@@ -334,6 +337,12 @@ OutputPtr ConfigSerializer::deserializeOutput(const QDBusArgument &arg)
             output->setAnaglyph(value.toBool());
         } else if (key == QLatin1String("otherStereoFormats")) {
             output->setOtherStereoFormats(value.toBool());
+        } else if (key == QLatin1String("sideBySideFullTiming")) {
+            output->setSideBySideFullTiming(static_cast<Output::SideBySideFullTiming>(value.toInt()));
+        } else if (key == QLatin1String("stereoDepthSource")) {
+            output->setStereoDepthSource(static_cast<Output::StereoDepthSource>(value.toInt()));
+        } else if (key == QLatin1String("stereoViewingDistance")) {
+            output->setStereoViewingDistance(value.toInt());
         } else if (key == QLatin1String("stereoPairPartner")) {
             output->setStereoPairPartner(value.toString());
         } else if (key == QLatin1String("stereoPairMode")) {
