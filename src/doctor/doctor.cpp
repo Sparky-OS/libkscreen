@@ -668,6 +668,14 @@ void Doctor::parseOutputArgs()
                         return;
                     }
                     m_changed = true;
+                } else if (ops.count() == 4 && subcmd == "swapEyes") {
+                    if (ops[3] != "enable" && ops[3] != "disable") {
+                        qCWarning(KSCREEN_DOCTOR) << "Invalid input: Only 'enable' and 'disable' are allowed";
+                        qApp->exit(9);
+                        return;
+                    }
+                    output->setStereoSwapEyes(ops[3] == "enable");
+                    m_changed = true;
                 } else if (ops.count() == 4 && subcmd == "stereoGlasses") {
                     if (ops[3] != "enable" && ops[3] != "disable") {
                         qCWarning(KSCREEN_DOCTOR) << "Invalid input: Only 'enable' and 'disable' are allowed";
@@ -1058,6 +1066,9 @@ void Doctor::showOutputs() const
         }
         if (output->capabilities() & Output::Capability::StereoGlasses) {
             cout << yellow << "\tSide by side 3D glasses: " << cr << (output->stereoGlasses() ? "enabled" : "disabled") << endl;
+        }
+        if (output->capabilities() & Output::Capability::StereoSwapEyes) {
+            cout << yellow << "\tSwap left and right eyes: " << cr << (output->stereoSwapEyes() ? "enabled" : "disabled") << endl;
         }
     }
 }

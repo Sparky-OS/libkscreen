@@ -84,7 +84,9 @@ int main(int argc, char **argv)
         "\n   Set the viewing distance of picture and depth 3D modes in centimetres (0 for automatic)\n"
         "   $ kscreen-doctor output.HDMI-A-1.viewingDistance.250\n"
         "\n   Treat the output as USB-C 3D glasses: a mode two eyes wide comes up in side by side (full) (possible values: enable, disable)\n"
-        "   $ kscreen-doctor output.DP-1.stereoGlasses.enable");
+        "   $ kscreen-doctor output.DP-1.stereoGlasses.enable\n"
+        "\n   Swap left and right eyes in every 3D mode of the output, for a display or glasses that show the eyes reversed (possible values: enable, disable)\n"
+        "   $ kscreen-doctor output.HDMI-A-1.swapEyes.enable");
     /*
         "\nError codes:\n"
         "   2 : general parse error\n"

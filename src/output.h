@@ -71,6 +71,7 @@ class KSCREEN_EXPORT Output : public QObject
     Q_PROPERTY(StereoDepthSource stereoDepthSource READ stereoDepthSource WRITE setStereoDepthSource NOTIFY stereoDepthChanged)
     Q_PROPERTY(uint stereoViewingDistance READ stereoViewingDistance WRITE setStereoViewingDistance NOTIFY stereoDepthChanged)
     Q_PROPERTY(bool stereoGlasses READ stereoGlasses WRITE setStereoGlasses NOTIFY stereoGlassesChanged)
+    Q_PROPERTY(bool stereoSwapEyes READ stereoSwapEyes WRITE setStereoSwapEyes NOTIFY stereoSwapEyesChanged)
     Q_PROPERTY(QString stereoPairPartner READ stereoPairPartner WRITE setStereoPairPartner NOTIFY stereoPairChanged)
     Q_PROPERTY(StereoPairMode stereoPairMode READ stereoPairMode WRITE setStereoPairMode NOTIFY stereoPairChanged)
     Q_PROPERTY(StereoPairRole stereoPairRole READ stereoPairRole WRITE setStereoPairRole NOTIFY stereoPairChanged)
@@ -164,7 +165,8 @@ public:
         HdrIccProfile = 1 << 15,
         AbmLevel = 1 << 16,
         VirtualStereo = 1 << 17,
-        // 1 << 18 and 1 << 19 are the compositor's swap eyes and iZ3D options
+        StereoSwapEyes = 1 << 18,
+        // 1 << 19 is the compositor's iZ3D options
         SideBySideFullTiming = 1 << 20,
         StereoDepth = 1 << 21,
         StereoGlasses = 1 << 22,
@@ -715,6 +717,16 @@ public:
     bool stereoGlasses() const;
     void setStereoGlasses(bool enabled);
 
+    /**
+     * Whether the output exchanges the two eyes: in every 3D mode of the output the right eye goes
+     * where the left one went and the left eye where the right one went, for a display or glasses
+     * that show the eyes reversed; a 2D mode then shows the right eye of stereo content. This is the
+     * one definitive eye swap (Capability::StereoSwapEyes); a program corrects a wrongly marked file
+     * in its own 3D menu instead.
+     */
+    bool stereoSwapEyes() const;
+    void setStereoSwapEyes(bool enabled);
+
     void apply(const OutputPtr &other);
 
 Q_SIGNALS:
@@ -769,6 +781,7 @@ Q_SIGNALS:
     void sideBySideFullTimingChanged();
     void stereoDepthChanged();
     void stereoGlassesChanged();
+    void stereoSwapEyesChanged();
 
     /** The mode list changed.
      *

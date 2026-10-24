@@ -92,6 +92,7 @@ QJsonObject ConfigSerializer::serializeOutput(const OutputPtr &output)
     obj[QLatin1String("stereoDepthSource")] = static_cast<int>(output->stereoDepthSource());
     obj[QLatin1String("stereoViewingDistance")] = static_cast<int>(output->stereoViewingDistance());
     obj[QLatin1String("stereoGlasses")] = output->stereoGlasses();
+    obj[QLatin1String("stereoSwapEyes")] = output->stereoSwapEyes();
     obj[QLatin1String("stereoPairPartner")] = output->stereoPairPartner();
     obj[QLatin1String("stereoPairMode")] = static_cast<int>(output->stereoPairMode());
     obj[QLatin1String("stereoPairRole")] = static_cast<int>(output->stereoPairRole());
@@ -346,6 +347,8 @@ OutputPtr ConfigSerializer::deserializeOutput(const QDBusArgument &arg)
             output->setStereoViewingDistance(value.toInt());
         } else if (key == QLatin1String("stereoGlasses")) {
             output->setStereoGlasses(value.toBool());
+        } else if (key == QLatin1String("stereoSwapEyes")) {
+            output->setStereoSwapEyes(value.toBool());
         } else if (key == QLatin1String("stereoPairPartner")) {
             output->setStereoPairPartner(value.toString());
         } else if (key == QLatin1String("stereoPairMode")) {

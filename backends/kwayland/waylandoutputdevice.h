@@ -145,6 +145,9 @@ protected:
 #ifdef KDE_OUTPUT_DEVICE_V2_STEREO_GLASSES_SINCE_VERSION
     void kde_output_device_v2_stereo_glasses(uint32_t enabled) override;
 #endif
+#ifdef KDE_OUTPUT_DEVICE_V2_STEREO_SWAP_EYES_SINCE_VERSION
+    void kde_output_device_v2_stereo_swap_eyes(uint32_t enabled) override;
+#endif
 
 private:
     QString modeName(const WaylandOutputDeviceMode *m) const;
@@ -213,6 +216,7 @@ private:
     uint32_t m_stereoDepthSource = 2;
     uint32_t m_stereoViewingDistance = 0;
     bool m_stereoGlasses = false;
+    bool m_stereoSwapEyes = false;
 };
 
 }

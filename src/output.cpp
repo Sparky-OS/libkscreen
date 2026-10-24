@@ -102,6 +102,7 @@ public:
         , stereoDepthSource(other.stereoDepthSource)
         , stereoViewingDistance(other.stereoViewingDistance)
         , stereoGlasses(other.stereoGlasses)
+        , stereoSwapEyes(other.stereoSwapEyes)
     {
         const auto otherModeList = other.modeList;
         for (const ModePtr &otherMode : otherModeList) {
@@ -183,6 +184,7 @@ public:
     Output::StereoDepthSource stereoDepthSource = Output::StereoDepthSource::DesktopAndContent;
     uint stereoViewingDistance = 0;
     bool stereoGlasses = false;
+    bool stereoSwapEyes = false;
 };
 
 bool Output::Private::compareModeList(const ModeList &before, const ModeList &after)
@@ -1272,6 +1274,19 @@ void Output::setStereoGlasses(bool enabled)
     }
 }
 
+bool Output::stereoSwapEyes() const
+{
+    return d->stereoSwapEyes;
+}
+
+void Output::setStereoSwapEyes(bool enabled)
+{
+    if (d->stereoSwapEyes != enabled) {
+        d->stereoSwapEyes = enabled;
+        Q_EMIT stereoSwapEyesChanged();
+    }
+}
+
 void Output::apply(const OutputPtr &other)
 {
     typedef void (KScreen::Output::*ChangeSignal)();
@@ -1495,6 +1510,10 @@ void Output::apply(const OutputPtr &other)
     if (d->stereoGlasses != other->d->stereoGlasses) {
         changes << &Output::stereoGlassesChanged;
         setStereoGlasses(other->d->stereoGlasses);
+    }
+    if (d->stereoSwapEyes != other->d->stereoSwapEyes) {
+        changes << &Output::stereoSwapEyesChanged;
+        setStereoSwapEyes(other->d->stereoSwapEyes);
     }
 
     // Non-notifyable changes

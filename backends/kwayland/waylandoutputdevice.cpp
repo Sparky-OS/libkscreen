@@ -338,6 +338,7 @@ void WaylandOutputDevice::updateKScreenOutput(OutputPtr &output, const QMap<int,
     output->setStereoDepthSource(static_cast<Output::StereoDepthSource>(m_stereoDepthSource));
     output->setStereoViewingDistance(m_stereoViewingDistance);
     output->setStereoGlasses(m_stereoGlasses);
+    output->setStereoSwapEyes(m_stereoSwapEyes);
 
     updateKScreenModes(output);
 
@@ -582,6 +583,12 @@ bool WaylandOutputDevice::setWlConfig(WaylandOutputManagement *management,
         changed = true;
     }
 #endif
+#ifdef KDE_OUTPUT_CONFIGURATION_V2_SET_STEREO_SWAP_EYES_SINCE_VERSION
+    if (version >= KDE_OUTPUT_CONFIGURATION_V2_SET_STEREO_SWAP_EYES_SINCE_VERSION && m_stereoSwapEyes != output->stereoSwapEyes()) {
+        wlConfig->set_stereo_swap_eyes(object(), output->stereoSwapEyes());
+        changed = true;
+    }
+#endif
 
     return changed;
 }
@@ -654,6 +661,9 @@ void WaylandOutputDevice::kde_output_device_v2_capabilities(uint32_t flags)
 #endif
 #ifndef KDE_OUTPUT_DEVICE_V2_STEREO_GLASSES_SINCE_VERSION
     m_capabilities &= ~uint32_t(Output::Capability::StereoGlasses);
+#endif
+#ifndef KDE_OUTPUT_DEVICE_V2_STEREO_SWAP_EYES_SINCE_VERSION
+    m_capabilities &= ~uint32_t(Output::Capability::StereoSwapEyes);
 #endif
 }
 
@@ -854,6 +864,13 @@ void WaylandOutputDevice::kde_output_device_v2_stereo_depth(uint32_t source, uin
 void WaylandOutputDevice::kde_output_device_v2_stereo_glasses(uint32_t enabled)
 {
     m_stereoGlasses = enabled == 1;
+}
+#endif
+
+#ifdef KDE_OUTPUT_DEVICE_V2_STEREO_SWAP_EYES_SINCE_VERSION
+void WaylandOutputDevice::kde_output_device_v2_stereo_swap_eyes(uint32_t enabled)
+{
+    m_stereoSwapEyes = enabled == 1;
 }
 #endif
 
