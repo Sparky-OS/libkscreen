@@ -220,6 +220,28 @@ private Q_SLOTS:
         QCOMPARE(glasses.count(), 1);
     }
 
+    void testSerializeStereoSwapEyes()
+    {
+        // the output's own eye order, the one definitive swap (Capability::StereoSwapEyes, the protocol's
+        // stereo_swap_eyes 0x40000): off by default, kept by the clone, the serializer and apply(). Read and
+        // written through the property system, so the test builds against a library without it and fails there.
+        KScreen::OutputPtr output(new KScreen::Output);
+        QVERIFY(output->metaObject()->indexOfProperty("stereoSwapEyes") >= 0);
+        QCOMPARE(output->property("stereoSwapEyes").toBool(), false);
+        QVERIFY(output->setProperty("stereoSwapEyes", true));
+        QCOMPARE(output->clone()->property("stereoSwapEyes").toBool(), true);
+        const auto json = KScreen::ConfigSerializer::serializeOutput(output);
+        QVERIFY(json.contains(QStringLiteral("stereoSwapEyes")));
+        QCOMPARE(json[QStringLiteral("stereoSwapEyes")].toBool(), true);
+        KScreen::OutputPtr other(new KScreen::Output);
+        QSignalSpy swapped(other.data(), SIGNAL(stereoSwapEyesChanged()));
+        QVERIFY(swapped.isValid());
+        other->apply(output);
+        QCOMPARE(other->property("stereoSwapEyes").toBool(), true);
+        QCOMPARE(swapped.count(), 1);
+        QCOMPARE(QMetaEnum::fromType<KScreen::Output::Capability>().keyToValue("StereoSwapEyes"), 0x40000);
+    }
+
     void testSerializeViewport()
     {
         KScreen::ModePtr mode(new KScreen::Mode);
