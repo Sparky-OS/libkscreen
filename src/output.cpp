@@ -101,6 +101,7 @@ public:
         , sideBySideFullTiming(other.sideBySideFullTiming)
         , stereoDepthSource(other.stereoDepthSource)
         , stereoViewingDistance(other.stereoViewingDistance)
+        , stereoGlasses(other.stereoGlasses)
     {
         const auto otherModeList = other.modeList;
         for (const ModePtr &otherMode : otherModeList) {
@@ -181,6 +182,7 @@ public:
     Output::SideBySideFullTiming sideBySideFullTiming = Output::SideBySideFullTiming::WholeLineDoubled;
     Output::StereoDepthSource stereoDepthSource = Output::StereoDepthSource::DesktopAndContent;
     uint stereoViewingDistance = 0;
+    bool stereoGlasses = false;
 };
 
 bool Output::Private::compareModeList(const ModeList &before, const ModeList &after)
@@ -1257,6 +1259,19 @@ void Output::setStereoViewingDistance(uint distance)
     }
 }
 
+bool Output::stereoGlasses() const
+{
+    return d->stereoGlasses;
+}
+
+void Output::setStereoGlasses(bool enabled)
+{
+    if (d->stereoGlasses != enabled) {
+        d->stereoGlasses = enabled;
+        Q_EMIT stereoGlassesChanged();
+    }
+}
+
 void Output::apply(const OutputPtr &other)
 {
     typedef void (KScreen::Output::*ChangeSignal)();
@@ -1476,6 +1491,10 @@ void Output::apply(const OutputPtr &other)
         changes << &Output::stereoDepthChanged;
         setStereoDepthSource(other->d->stereoDepthSource);
         setStereoViewingDistance(other->d->stereoViewingDistance);
+    }
+    if (d->stereoGlasses != other->d->stereoGlasses) {
+        changes << &Output::stereoGlassesChanged;
+        setStereoGlasses(other->d->stereoGlasses);
     }
 
     // Non-notifyable changes

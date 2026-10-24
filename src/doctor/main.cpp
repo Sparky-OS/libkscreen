@@ -82,7 +82,9 @@ int main(int argc, char **argv)
         "\n   Choose the depth sent with picture and depth 3D modes (possible values: flat, desktop, desktopAndContent)\n"
         "   $ kscreen-doctor output.HDMI-A-1.stereoDepth.desktop\n"
         "\n   Set the viewing distance of picture and depth 3D modes in centimetres (0 for automatic)\n"
-        "   $ kscreen-doctor output.HDMI-A-1.viewingDistance.250");
+        "   $ kscreen-doctor output.HDMI-A-1.viewingDistance.250\n"
+        "\n   Treat the output as USB-C 3D glasses: a mode two eyes wide comes up in side by side (full) (possible values: enable, disable)\n"
+        "   $ kscreen-doctor output.DP-1.stereoGlasses.enable");
     /*
         "\nError codes:\n"
         "   2 : general parse error\n"

@@ -70,6 +70,7 @@ class KSCREEN_EXPORT Output : public QObject
     Q_PROPERTY(SideBySideFullTiming sideBySideFullTiming READ sideBySideFullTiming WRITE setSideBySideFullTiming NOTIFY sideBySideFullTimingChanged)
     Q_PROPERTY(StereoDepthSource stereoDepthSource READ stereoDepthSource WRITE setStereoDepthSource NOTIFY stereoDepthChanged)
     Q_PROPERTY(uint stereoViewingDistance READ stereoViewingDistance WRITE setStereoViewingDistance NOTIFY stereoDepthChanged)
+    Q_PROPERTY(bool stereoGlasses READ stereoGlasses WRITE setStereoGlasses NOTIFY stereoGlassesChanged)
     Q_PROPERTY(QString stereoPairPartner READ stereoPairPartner WRITE setStereoPairPartner NOTIFY stereoPairChanged)
     Q_PROPERTY(StereoPairMode stereoPairMode READ stereoPairMode WRITE setStereoPairMode NOTIFY stereoPairChanged)
     Q_PROPERTY(StereoPairRole stereoPairRole READ stereoPairRole WRITE setStereoPairRole NOTIFY stereoPairChanged)
@@ -166,6 +167,7 @@ public:
         // 1 << 18 and 1 << 19 are the compositor's swap eyes and iZ3D options
         SideBySideFullTiming = 1 << 20,
         StereoDepth = 1 << 21,
+        StereoGlasses = 1 << 22,
     };
     Q_ENUM(Capability)
     Q_DECLARE_FLAGS(Capabilities, Capability)
@@ -705,6 +707,14 @@ public:
     uint stereoViewingDistance() const;
     void setStereoViewingDistance(uint distance);
 
+    /**
+     * Whether the output is USB-C 3D glasses that show a picture two eyes wide as two eyes: a 2D mode
+     * of that shape comes up as its side by side (full) twin when no saved mode fits. On by default
+     * for the glasses the compositor knows by their EDID (Capability::StereoGlasses).
+     */
+    bool stereoGlasses() const;
+    void setStereoGlasses(bool enabled);
+
     void apply(const OutputPtr &other);
 
 Q_SIGNALS:
@@ -758,6 +768,7 @@ Q_SIGNALS:
     void abmLevelChanged();
     void sideBySideFullTimingChanged();
     void stereoDepthChanged();
+    void stereoGlassesChanged();
 
     /** The mode list changed.
      *

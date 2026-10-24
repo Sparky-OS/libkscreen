@@ -208,6 +208,16 @@ private Q_SLOTS:
         QCOMPARE(other->stereoViewingDistance(), 250u);
         QCOMPARE(timing.count(), 1);
         QVERIFY(depth.count() >= 1);
+
+        // side by side 3D glasses: off unless the compositor or the user turn it on
+        QVERIFY(!output->stereoGlasses());
+        output->setStereoGlasses(true);
+        QVERIFY(output->clone()->stereoGlasses());
+        QCOMPARE(KScreen::ConfigSerializer::serializeOutput(output)[QStringLiteral("stereoGlasses")].toBool(), true);
+        QSignalSpy glasses(other.data(), &KScreen::Output::stereoGlassesChanged);
+        other->apply(output);
+        QVERIFY(other->stereoGlasses());
+        QCOMPARE(glasses.count(), 1);
     }
 
     void testSerializeViewport()

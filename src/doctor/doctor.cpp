@@ -668,6 +668,14 @@ void Doctor::parseOutputArgs()
                         return;
                     }
                     m_changed = true;
+                } else if (ops.count() == 4 && subcmd == "stereoGlasses") {
+                    if (ops[3] != "enable" && ops[3] != "disable") {
+                        qCWarning(KSCREEN_DOCTOR) << "Invalid input: Only 'enable' and 'disable' are allowed";
+                        qApp->exit(9);
+                        return;
+                    }
+                    output->setStereoGlasses(ops[3] == "enable");
+                    m_changed = true;
                 } else if (ops.count() == 4 && subcmd == "viewingDistance") {
                     bool ok = false;
                     const uint distance = ops[3].toUInt(&ok);
@@ -1047,6 +1055,9 @@ void Doctor::showOutputs() const
             static const char *sources[] = {"flat", "desktop", "desktop and content"};
             cout << yellow << "\tStereo depth: " << cr << sources[std::clamp(int(output->stereoDepthSource()), 0, 2)] << ", viewing distance "
                  << output->stereoViewingDistance() << endl;
+        }
+        if (output->capabilities() & Output::Capability::StereoGlasses) {
+            cout << yellow << "\tSide by side 3D glasses: " << cr << (output->stereoGlasses() ? "enabled" : "disabled") << endl;
         }
     }
 }

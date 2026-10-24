@@ -23,7 +23,9 @@
 using namespace KScreen;
 
 WaylandOutputDeviceRegistry::WaylandOutputDeviceRegistry()
-#if defined(KDE_OUTPUT_DEVICE_V2_STEREO_DEPTH_SINCE_VERSION)
+#if defined(KDE_OUTPUT_DEVICE_V2_STEREO_GLASSES_SINCE_VERSION)
+    : QWaylandClientExtensionTemplate<WaylandOutputDeviceRegistry>(29)
+#elif defined(KDE_OUTPUT_DEVICE_V2_STEREO_DEPTH_SINCE_VERSION)
     : QWaylandClientExtensionTemplate<WaylandOutputDeviceRegistry>(28)
 #elif defined(KDE_OUTPUT_DEVICE_MODE_V2_VIEW_SIZE_SINCE_VERSION)
     : QWaylandClientExtensionTemplate<WaylandOutputDeviceRegistry>(25)
@@ -335,6 +337,7 @@ void WaylandOutputDevice::updateKScreenOutput(OutputPtr &output, const QMap<int,
     output->setSideBySideFullTiming(static_cast<Output::SideBySideFullTiming>(m_sideBySideFullTiming));
     output->setStereoDepthSource(static_cast<Output::StereoDepthSource>(m_stereoDepthSource));
     output->setStereoViewingDistance(m_stereoViewingDistance);
+    output->setStereoGlasses(m_stereoGlasses);
 
     updateKScreenModes(output);
 
@@ -573,6 +576,12 @@ bool WaylandOutputDevice::setWlConfig(WaylandOutputManagement *management,
         changed = true;
     }
 #endif
+#ifdef KDE_OUTPUT_CONFIGURATION_V2_SET_STEREO_GLASSES_SINCE_VERSION
+    if (version >= KDE_OUTPUT_CONFIGURATION_V2_SET_STEREO_GLASSES_SINCE_VERSION && m_stereoGlasses != output->stereoGlasses()) {
+        wlConfig->set_stereo_glasses(object(), output->stereoGlasses());
+        changed = true;
+    }
+#endif
 
     return changed;
 }
@@ -642,6 +651,9 @@ void WaylandOutputDevice::kde_output_device_v2_capabilities(uint32_t flags)
 #endif
 #ifndef KDE_OUTPUT_DEVICE_V2_STEREO_DEPTH_SINCE_VERSION
     m_capabilities &= ~(uint32_t(Output::Capability::SideBySideFullTiming) | uint32_t(Output::Capability::StereoDepth));
+#endif
+#ifndef KDE_OUTPUT_DEVICE_V2_STEREO_GLASSES_SINCE_VERSION
+    m_capabilities &= ~uint32_t(Output::Capability::StereoGlasses);
 #endif
 }
 
@@ -835,6 +847,13 @@ void WaylandOutputDevice::kde_output_device_v2_stereo_depth(uint32_t source, uin
 {
     m_stereoDepthSource = source;
     m_stereoViewingDistance = viewingDistance;
+}
+#endif
+
+#ifdef KDE_OUTPUT_DEVICE_V2_STEREO_GLASSES_SINCE_VERSION
+void WaylandOutputDevice::kde_output_device_v2_stereo_glasses(uint32_t enabled)
+{
+    m_stereoGlasses = enabled == 1;
 }
 #endif
 

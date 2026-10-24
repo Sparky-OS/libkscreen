@@ -142,6 +142,9 @@ protected:
     void kde_output_device_v2_side_by_side_full_timing(uint32_t timing) override;
     void kde_output_device_v2_stereo_depth(uint32_t source, uint32_t viewingDistance) override;
 #endif
+#ifdef KDE_OUTPUT_DEVICE_V2_STEREO_GLASSES_SINCE_VERSION
+    void kde_output_device_v2_stereo_glasses(uint32_t enabled) override;
+#endif
 
 private:
     QString modeName(const WaylandOutputDeviceMode *m) const;
@@ -209,6 +212,7 @@ private:
     uint32_t m_sideBySideFullTiming = 0;
     uint32_t m_stereoDepthSource = 2;
     uint32_t m_stereoViewingDistance = 0;
+    bool m_stereoGlasses = false;
 };
 
 }
