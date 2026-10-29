@@ -51,6 +51,9 @@ public:
         Stereo3DLineAlternative = 0x200000,
         Stereo3DLDepth = 0x400000,
         Stereo3DLDepthGraphics = 0x800000,
+        // DisplayPort's frame sequential stereo, the eyes alternated and signalled by the source
+        // (kde_output_device_mode_v2.flags since version 30)
+        Stereo3DSequentialDisplayPort = 0x1000000,
     };
     Q_ENUM(Flag);
     Q_DECLARE_FLAGS(Flags, Flag)

@@ -806,6 +806,8 @@ void Doctor::showOutputs() const
                 name = name + QStringLiteral("(3D-L+depth)");
             } else if (mode->stereo3D() == Mode::Stereo3D::LDepthGraphics) {
                 name = name + QStringLiteral("(3D-L+depth+gfx)");
+            } else if (mode->stereo3D() == Mode::Stereo3D::SequentialDisplayPort && !mode->virtualStereo()) {
+                name = name + QStringLiteral("(3D-FS-DP)");
             }
             if (mode->virtualStereo()) {
                 name += QStringLiteral("(virtual-3D:%1)").arg(int(mode->stereo3D()));

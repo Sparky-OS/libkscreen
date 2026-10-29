@@ -111,6 +111,12 @@ void WaylandOutputDeviceMode::kde_output_device_mode_v2_flags(uint32_t flags)
         m_flags |= ModeInfo::Flag::Stereo3DLDepthGraphics;
     }
 #endif
+#ifdef KDE_OUTPUT_DEVICE_MODE_V2_FLAGS_STEREO_SEQUENTIAL_DISPLAYPORT_SINCE_VERSION
+    // DisplayPort's frame sequential stereo, since version 30
+    if (flags & KDE_OUTPUT_DEVICE_MODE_V2_FLAGS_STEREO_SEQUENTIAL_DISPLAYPORT) {
+        m_flags |= ModeInfo::Flag::Stereo3DSequentialDisplayPort;
+    }
+#endif
 
     if (flags & KDE_OUTPUT_DEVICE_MODE_V2_FLAGS_CUSTOM) {
         m_flags |= ModeInfo::Flag::Custom;

@@ -32,6 +32,9 @@ public:
     /**
      * The HDMI 3D structure the mode is sent in: a 3D mode repeats a 2D mode's size and
      * refresh rate, and choosing it turns the display's 3D on. Never chosen automatically.
+     * SequentialDisplayPort is DisplayPort's own frame sequential stereo: the source sends one
+     * eye per frame of the mode, left eye first, and tells the display which eye each frame
+     * carries; with virtualStereo() it is the twin of a 2D mode that the display did not declare.
      */
     enum class Stereo3D {
         None,
@@ -53,6 +56,7 @@ public:
         LineAlternative,
         LDepth,
         LDepthGraphics,
+        SequentialDisplayPort,
     };
     Q_ENUM(Stereo3D)
 

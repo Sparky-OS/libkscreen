@@ -172,7 +172,8 @@ private Q_SLOTS:
         for (const auto structure : {KScreen::Mode::Stereo3D::FieldAlternative,
                                      KScreen::Mode::Stereo3D::LineAlternative,
                                      KScreen::Mode::Stereo3D::LDepth,
-                                     KScreen::Mode::Stereo3D::LDepthGraphics}) {
+                                     KScreen::Mode::Stereo3D::LDepthGraphics,
+                                     KScreen::Mode::Stereo3D::SequentialDisplayPort}) {
             KScreen::ModePtr mode(new KScreen::Mode);
             mode->setId(QStringLiteral("3"));
             mode->setSize(QSize(1920, 1080));

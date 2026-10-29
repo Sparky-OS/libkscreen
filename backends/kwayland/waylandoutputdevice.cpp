@@ -23,7 +23,9 @@
 using namespace KScreen;
 
 WaylandOutputDeviceRegistry::WaylandOutputDeviceRegistry()
-#if defined(KDE_OUTPUT_DEVICE_V2_STEREO_GLASSES_SINCE_VERSION)
+#if defined(KDE_OUTPUT_DEVICE_MODE_V2_FLAGS_STEREO_SEQUENTIAL_DISPLAYPORT_SINCE_VERSION)
+    : QWaylandClientExtensionTemplate<WaylandOutputDeviceRegistry>(30)
+#elif defined(KDE_OUTPUT_DEVICE_V2_STEREO_GLASSES_SINCE_VERSION)
     : QWaylandClientExtensionTemplate<WaylandOutputDeviceRegistry>(29)
 #elif defined(KDE_OUTPUT_DEVICE_V2_STEREO_DEPTH_SINCE_VERSION)
     : QWaylandClientExtensionTemplate<WaylandOutputDeviceRegistry>(28)
@@ -217,6 +219,8 @@ void KScreen::WaylandOutputDevice::updateKScreenModes(OutputPtr &output)
             mode->setStereo3D(Mode::Stereo3D::LDepth);
         } else if (wlMode->flags() & ModeInfo::Flag::Stereo3DLDepthGraphics) {
             mode->setStereo3D(Mode::Stereo3D::LDepthGraphics);
+        } else if (wlMode->flags() & ModeInfo::Flag::Stereo3DSequentialDisplayPort) {
+            mode->setStereo3D(Mode::Stereo3D::SequentialDisplayPort);
         }
 
         if (wlMode->flags() & ModeInfo::Flag::Stereo3DAnaglyphModern) {
